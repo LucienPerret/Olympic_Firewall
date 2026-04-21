@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/main-menu.uss?fileID=7433441132597879392&amp;guid=7e733b908a9eb8b4fb061878e7f1e6b6&amp;type=3#main-menu"/>
+    <ui:VisualElement name="Background" class="panel" style="flex-grow: 1; justify-content: flex-end;">
+        <ui:Button text="Button" name="PlayButton" class="unity-button" style="justify-content: flex-start; align-items: auto; align-self: center; align-content: auto; height: 208px;"/>
+        <ui:Button text="Button" name="SettingsButton" class="unity-button"/>
+        <ui:Button text="Button" name="QuitButton" class="unity-button"/>
+    </ui:VisualElement>
+</ui:UXML>
