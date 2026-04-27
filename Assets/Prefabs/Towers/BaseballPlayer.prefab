@@ -114,6 +114,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe500b76226464a41a9852db3233a629, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerPlacement
+  placementRadius: 0.4
+  blockedLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  validColor: {r: 1, g: 1, b: 1, a: 0.7}
+  invalidColor: {r: 1, g: 0, b: 0, a: 0.7}
 --- !u!95 &1137214055798535208
 Animator:
   serializedVersion: 7
@@ -244,8 +250,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1443550779
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -1956479325, guid: 77a112f25abce2e4a81077ed4c7a47b6, type: 3}
@@ -335,8 +341,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1443550779
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 6533138506408875429, guid: 77a112f25abce2e4a81077ed4c7a47b6, type: 3}

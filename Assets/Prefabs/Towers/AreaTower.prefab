@@ -155,3 +155,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe500b76226464a41a9852db3233a629, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerPlacement
+  placementRadius: 0.4
+  blockedLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  spriteRenderer: {fileID: 0}
+  validColor: {r: 1, g: 1, b: 1, a: 0.7}
+  invalidColor: {r: 1, g: 0, b: 0, a: 0.7}

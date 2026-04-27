@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,6 +24,7 @@ public class Tower : MonoBehaviour
     private void OnDisable()
     {
         Enemy.OnEnemyDestroyed -= HandleEnemyDestroyed;
+        TowerPlacement.OnPlacementConfirmed -= ActivateTower;
     }
 
     private void Start()
@@ -115,35 +115,51 @@ public class Tower : MonoBehaviour
 
     private void StartAnimation()
     {
-        _enemiesInRange.RemoveAll(enemy => enemy == null || !enemy.gameObject.activeInHierarchy);
-
-        if (_enemiesInRange.Count > 0)
+        Enemy target = GetTargetForShot();
+        if (target == null)
         {
-
-            _animator.SetTrigger("Shoot");
-
-        }
-            }
-
-    private void Shoot()
-    {
-        Enemy target = GetValidTarget();
-        if (target == null) {
             PlayNothing();
             return;
         }
 
+        if (_animator == null)
+        {
+            Shoot();
+            return;
+        }
+
+        _animator.SetTrigger("Shoot");
+    }
+
+    public void Shoot()
+    {
+        Enemy target = GetTargetForShot();
+        if (target == null)
+        {
+            PlayNothing();
+            return;
+        }
+
+        if (_projectilePool == null || _projectileOrigin == null)
+        {
+            return;
+        }
+
         GameObject projectile = _projectilePool.GetPooledObject();
+        if (projectile == null)
+        {
+            return;
+        }
+
         projectile.transform.position = _projectileOrigin.position;
 
-        // rotate Tower
-        Vector2 _shootDirection = (_enemiesInRange[0].transform.position - _projectileOrigin.position).normalized;
-        Rotate(_shootDirection);
+        Vector2 shootDirection = (GetTargetPosition(target) - _projectileOrigin.position).normalized;
+        Rotate(shootDirection);
 
-        // verify shoot diretcion (needed for off centre shooting points)
-        _shootDirection = (_enemiesInRange[0].transform.position - _projectileOrigin.position).normalized;
+        // Recalculate after rotating so off-center shoot origins still point at the live target.
+        shootDirection = (GetTargetPosition(target) - _projectileOrigin.position).normalized;
         projectile.SetActive(true);
-        projectile.GetComponent<Projectile>().Shoot(data, _shootDirection);
+        projectile.GetComponent<Projectile>().Shoot(data, shootDirection);
     }
 
     private void AreaDamage()
@@ -195,6 +211,53 @@ public class Tower : MonoBehaviour
             return null;
 
         return _enemiesInRange[0];
+    }
+
+    private Enemy GetTargetForShot()
+    {
+        if (data.targetType != TargetType.Single)
+        {
+            return GetValidTarget();
+        }
+
+        return GetLeadingTarget();
+    }
+
+    private Enemy GetLeadingTarget()
+    {
+        _enemiesInRange.RemoveAll(enemy => enemy == null || !enemy.gameObject.activeInHierarchy);
+        if (_enemiesInRange.Count == 0)
+        {
+            return null;
+        }
+
+        Enemy selectedTarget = _enemiesInRange[0];
+        float highestProgress = selectedTarget.GetPathProgress();
+
+        for (int i = 1; i < _enemiesInRange.Count; i++)
+        {
+            Enemy currentEnemy = _enemiesInRange[i];
+            float currentProgress = currentEnemy.GetPathProgress();
+
+            if (currentProgress > highestProgress)
+            {
+                selectedTarget = currentEnemy;
+                highestProgress = currentProgress;
+            }
+        }
+
+        return selectedTarget;
+    }
+
+    private Vector3 GetTargetPosition(Enemy target)
+    {
+        Collider2D targetCollider = target.GetComponent<Collider2D>();
+        if (targetCollider != null)
+        {
+            return targetCollider.bounds.center;
+        }
+
+        return target.transform.position;
     }
 
 

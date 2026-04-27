@@ -13,8 +13,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Restricted
+  - Tower
   - 
   - 
   - 
@@ -45,6 +45,9 @@ TagManager:
     locked: 0
   - name: Background
     uniqueID: 3469674051
+    locked: 0
+  - name: Restricted
+    uniqueID: 3057408605
     locked: 0
   - name: Towers
     uniqueID: 2851416517
