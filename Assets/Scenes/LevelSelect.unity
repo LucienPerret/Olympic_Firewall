@@ -482,7 +482,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: LevelSelect
+          m_StringArgument: Game
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &440311906
@@ -810,6 +810,7 @@ GameObject:
   - component: {fileID: 1159973813}
   - component: {fileID: 1159973812}
   - component: {fileID: 1159973816}
+  - component: {fileID: 1159973817}
   m_Layer: 5
   m_Name: MainMenu
   m_TagString: Untagged
@@ -916,6 +917,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d4b35b4858c1f146a715709851db36c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
+--- !u!114 &1159973817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1159973811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c696eab93d34e5a8a7c54d2c3ab5bf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSelectMenu
 --- !u!1 &1206755369
 GameObject:
   m_ObjectHideFlags: 0
