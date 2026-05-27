@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
+    private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
+    private static readonly int EnemyInRangeBool = Animator.StringToHash("EnemyInRange");
+
     [SerializeField] private TowerData data;
     public TowerData Data => data;
 
@@ -15,6 +18,7 @@ public class Tower : MonoBehaviour
 
     private float _damageTimer;
     private bool _active = false;
+    private bool _hasEnemyInRangeAnimatorParameter;
 
     private void OnEnable()
     {
@@ -25,6 +29,7 @@ public class Tower : MonoBehaviour
     {
         Enemy.OnEnemyDestroyed -= HandleEnemyDestroyed;
         TowerPlacement.OnPlacementConfirmed -= ActivateTower;
+        SetAreaAttackAnimation(false);
     }
 
     private void Start()
@@ -35,6 +40,7 @@ public class Tower : MonoBehaviour
         _enemiesInRange = new List<Enemy>();
         _damageTimer = data.damageInterval;
         _projectileOrigin = transform.Find("ShootOrigin");
+        _hasEnemyInRangeAnimatorParameter = HasAnimatorParameter(EnemyInRangeBool, AnimatorControllerParameterType.Bool);
         if (data.targetType == TargetType.Single ||
             data.targetType == TargetType.Multi)
         {
@@ -52,6 +58,11 @@ public class Tower : MonoBehaviour
 
         // Not sure if this needs to run every Update
         _enemiesInRange.RemoveAll(enemy => enemy == null || !enemy.gameObject.activeInHierarchy);
+        if (data.targetType == TargetType.Area)
+        {
+            UpdateAreaTowerState();
+        }
+
         if (_enemiesInRange.Count == 0) 
         {
             PlayNothing();
@@ -75,7 +86,15 @@ public class Tower : MonoBehaviour
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
-            _enemiesInRange.Add(enemy);
+            if (enemy != null && !_enemiesInRange.Contains(enemy))
+            {
+                _enemiesInRange.Add(enemy);
+            }
+
+            if (_active && data.targetType == TargetType.Area)
+            {
+                UpdateAreaTowerState();
+            }
         }
     }
 
@@ -90,6 +109,10 @@ public class Tower : MonoBehaviour
             }
         }
 
+        if (_active && data.targetType == TargetType.Area)
+        {
+            UpdateAreaTowerState();
+        }
     }
 
     private void DealDamage(TargetType towerType)
@@ -128,7 +151,7 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        _animator.SetTrigger("Shoot");
+        _animator.SetTrigger(ShootTrigger);
     }
 
     public void Shoot()
@@ -179,6 +202,11 @@ public class Tower : MonoBehaviour
     private void HandleEnemyDestroyed(Enemy enemy)
     {
         _enemiesInRange.Remove(enemy);
+
+        if (_active && data.targetType == TargetType.Area)
+        {
+            UpdateAreaTowerState();
+        }
     }
 
     private void Rotate(Vector2 direction)
@@ -198,7 +226,8 @@ public class Tower : MonoBehaviour
 
     private void PlayNothing()
     {
-        // no clean fix
+        SetAreaAttackAnimation(false);
+
         if (_animator == null) { return; }
         _animator.Play("Idle");
     }
@@ -258,6 +287,57 @@ public class Tower : MonoBehaviour
         }
 
         return target.transform.position;
+    }
+
+    private void UpdateAreaTowerState()
+    {
+        if (data.targetType != TargetType.Area)
+        {
+            return;
+        }
+
+        Enemy target = GetLeadingTarget();
+        bool enemyInRange = target != null;
+        SetAreaAttackAnimation(enemyInRange);
+
+        if (!enemyInRange)
+        {
+            return;
+        }
+
+        Vector2 direction = (GetTargetPosition(target) - transform.position).normalized;
+        if (direction.sqrMagnitude > Mathf.Epsilon)
+        {
+            Rotate(direction);
+        }
+    }
+
+    private void SetAreaAttackAnimation(bool enemyInRange)
+    {
+        if (_animator == null || !_hasEnemyInRangeAnimatorParameter || data.targetType != TargetType.Area)
+        {
+            return;
+        }
+
+        _animator.SetBool(EnemyInRangeBool, enemyInRange);
+    }
+
+    private bool HasAnimatorParameter(int parameterHash, AnimatorControllerParameterType parameterType)
+    {
+        if (_animator == null)
+        {
+            return false;
+        }
+
+        foreach (AnimatorControllerParameter parameter in _animator.parameters)
+        {
+            if (parameter.nameHash == parameterHash && parameter.type == parameterType)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
