@@ -2,8 +2,8 @@ using UnityEngine;
 
 public enum EnemyType
 {
-    Orc,
-    Dragon,
-    Kaiju
+    Virox,
+    Skitter,
+    Corruptor
     
 }

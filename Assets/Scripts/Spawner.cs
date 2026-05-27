@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Spawner : MonoBehaviour
 {
     public static event Action<int> OnWaveChanged;
+    public static event Action<bool> OnWaveStateChanged;
 
     [SerializeField] private WaveData[] waves;
     // Starts at 1 again after all waves are cleared
@@ -18,9 +20,12 @@ public class Spawner : MonoBehaviour
     private int _enemiesRemoved;
    
 
-    [SerializeField] private ObejctPooler orcPool;
-    [SerializeField] private ObejctPooler dragonPool;
-    [SerializeField] private ObejctPooler kaijuPool;
+    [FormerlySerializedAs("orcPool")]
+    [SerializeField] private ObejctPooler viroxPool;
+    [FormerlySerializedAs("dragonPool")]
+    [SerializeField] private ObejctPooler skitterPool;
+    [FormerlySerializedAs("kaijuPool")]
+    [SerializeField] private ObejctPooler corruptorPool;
 
     private Dictionary<EnemyType, ObejctPooler> _poolDictionary;
 
@@ -31,9 +36,9 @@ public class Spawner : MonoBehaviour
     {
         _poolDictionary = new Dictionary<EnemyType, ObejctPooler>()
         {
-            {EnemyType.Orc, orcPool},
-            {EnemyType.Dragon, dragonPool},
-            {EnemyType.Kaiju, kaijuPool}
+            {EnemyType.Virox, viroxPool},
+            {EnemyType.Skitter, skitterPool},
+            {EnemyType.Corruptor, corruptorPool}
         };
     }
 
@@ -52,6 +57,7 @@ public class Spawner : MonoBehaviour
     private void Start()
     {
         OnWaveChanged?.Invoke(_waveCounter);
+        OnWaveStateChanged?.Invoke(_runningWave);
     }
     private void Update()
     {
@@ -66,7 +72,7 @@ public class Spawner : MonoBehaviour
             }
             else if (_spawnCounter >= CurrentWave.enemiesPerWave && _enemiesRemoved >= CurrentWave.enemiesPerWave)
             {
-                _runningWave = false;
+                SetWaveRunning(false);
             }
 
         }
@@ -101,13 +107,29 @@ public class Spawner : MonoBehaviour
 
     public void StartWave()
     {
+        if (_runningWave || waves == null || waves.Length == 0)
+        {
+            return;
+        }
+
         _currentWaveIndex = (_currentWaveIndex + 1) % waves.Length;
         _waveCounter++;
         OnWaveChanged?.Invoke(_waveCounter);
         _spawnCounter = 0;
         _enemiesRemoved = 0;
         _spawnTimer = 0f;
-        _runningWave = true;
+        SetWaveRunning(true);
 
+    }
+
+    private void SetWaveRunning(bool isRunning)
+    {
+        if (_runningWave == isRunning)
+        {
+            return;
+        }
+
+        _runningWave = isRunning;
+        OnWaveStateChanged?.Invoke(_runningWave);
     }
 }

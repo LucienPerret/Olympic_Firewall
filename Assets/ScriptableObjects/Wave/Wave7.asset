@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c55f02bc1219d0640ba1f3db93bca17d, type: 3}
-  m_Name: Wave1
+  m_Name: Wave7
   m_EditorClassIdentifier: Assembly-CSharp::WaveData
-  enemyType: 0
-  spawnInterval: 2
-  enemiesPerWave: 3
+  enemyType: 2
+  spawnInterval: 1
+  enemiesPerWave: 15

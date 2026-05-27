@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
@@ -9,17 +10,27 @@ public class UIController : MonoBehaviour
     [SerializeField] private TMP_Text resourcesText;
 
     [SerializeField] private GameObject towerPanel;
+    [SerializeField] private Button nextWaveButton;
 
+    private void Awake()
+    {
+        if (nextWaveButton == null)
+        {
+            nextWaveButton = GameObject.Find("NextWave")?.GetComponent<Button>();
+        }
+    }
 
     private void OnEnable()
     {
         Spawner.OnWaveChanged += UpdateWaveText;
+        Spawner.OnWaveStateChanged += UpdateNextWaveButtonState;
         GameManager.OnLivesChanged += UpdateLivesText;
         GameManager.OnResourcesChanged += UpdateResourcesText;
     }
     private void OnDisable()
     {
         Spawner.OnWaveChanged -= UpdateWaveText;
+        Spawner.OnWaveStateChanged -= UpdateNextWaveButtonState;
         GameManager.OnLivesChanged -= UpdateLivesText;
         GameManager.OnResourcesChanged -= UpdateResourcesText;
     }
@@ -36,6 +47,14 @@ public class UIController : MonoBehaviour
     private void UpdateResourcesText(int currentResources)
     {
         resourcesText.text = $"Resources: {currentResources}";
+    }
+
+    private void UpdateNextWaveButtonState(bool isWaveActive)
+    {
+        if (nextWaveButton != null)
+        {
+            nextWaveButton.interactable = !isWaveActive;
+        }
     }
 
     private void ShowTowerPanel()
