@@ -1987,9 +1987,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8bc63ec7b62ea114e84f2ee7532d64e4, type: 2}
   - {fileID: 11400000, guid: 17b11cf2bc66a874dbb2f6de7aeaddff, type: 2}
   - {fileID: 11400000, guid: 2a13ba1bb39fcb7409c6afa0f03d2ac8, type: 2}
-  orcPool: {fileID: 818302318}
-  dragonPool: {fileID: 1128035724}
-  kaijuPool: {fileID: 1220690655}
+  - {fileID: 11400000, guid: 86f400a45027b5444a7315e52bfad611, type: 2}
+  - {fileID: 11400000, guid: b66eab6de5c782046b7f4136047a1879, type: 2}
+  healthIncreasePerWave: 0.1
+  viroxPool: {fileID: 818302318}
+  skitterPool: {fileID: 1128035724}
+  corruptorPool: {fileID: 1220690655}
 --- !u!4 &1974658797
 Transform:
   m_ObjectHideFlags: 0
@@ -2162,7 +2165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8372f470f27449e4a8d8c045142bb8b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  towerManager: {fileID: 1587260745}
 --- !u!4 &2128796635
 Transform:
   m_ObjectHideFlags: 0
