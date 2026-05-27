@@ -553,9 +553,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
   enemyDeathClip: {fileID: 8300000, guid: 00deaf9f13e7abf4e8adfba5723819b5, type: 3}
+  enemyDeathVolume: 0.5
   moneySpentClip: {fileID: 8300000, guid: d9753630d1a36b743ba0b6550e50aff1, type: 3}
   buttonClickClip: {fileID: 8300000, guid: 7f284a9543ef80141a55ca2dc2800e6a, type: 3}
+  menuMusicClip: {fileID: 8300000, guid: 9f22e9e0480786c43943327e726444ef, type: 3}
+  levelMusicClip: {fileID: 8300000, guid: e5d10b258263c72408e3657da36197a7, type: 3}
   sfxVolume: 0.7
+  musicVolume: 0.5
   spatialBlend: 0
   initialEmitterPoolSize: 5
 --- !u!4 &518599859

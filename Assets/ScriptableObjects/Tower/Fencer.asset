@@ -19,4 +19,4 @@ MonoBehaviour:
   projectileSpeed: 0
   projectileDuration: 0
   projectileSize: 0
-  cost: 10
+  cost: 30

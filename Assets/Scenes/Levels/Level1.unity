@@ -1959,6 +1959,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Spawner
   waves:
   - {fileID: 11400000, guid: 8bc63ec7b62ea114e84f2ee7532d64e4, type: 2}
+  - {fileID: 11400000, guid: 17b11cf2bc66a874dbb2f6de7aeaddff, type: 2}
+  - {fileID: 11400000, guid: 2a13ba1bb39fcb7409c6afa0f03d2ac8, type: 2}
+  - {fileID: 11400000, guid: 86f400a45027b5444a7315e52bfad611, type: 2}
+  - {fileID: 11400000, guid: b66eab6de5c782046b7f4136047a1879, type: 2}
+  healthIncreasePerWave: 0.1
   viroxPool: {fileID: 818302318}
   skitterPool: {fileID: 1128035724}
   corruptorPool: {fileID: 1220690655}
@@ -2271,6 +2276,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 687658246305371819, guid: 23c2ea05929c5184489369ae3d99e18b, type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 687658246305371819, guid: 23c2ea05929c5184489369ae3d99e18b, type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 687658246305371819, guid: 23c2ea05929c5184489369ae3d99e18b, type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4637787380253684045, guid: 23c2ea05929c5184489369ae3d99e18b, type: 3}
       propertyPath: m_Name
       value: UICanvas
