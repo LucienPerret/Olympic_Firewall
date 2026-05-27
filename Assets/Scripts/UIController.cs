@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour
 {
     private const string MainMenuSceneName = "MainMenu";
+    private const string WinTitle = "You Won!";
+    private const string GameOverTitle = "Game Over";
 
     [SerializeField] private TMP_Text waveText;
     [SerializeField] private TMP_Text livesText;
@@ -14,8 +16,13 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject towerPanel;
     [SerializeField] private Button nextWaveButton;
 
-    private GameObject _winPopup;
-    private bool _hasWon;
+    private GameObject _endStatePopup;
+    private Image _endStateOverlayImage;
+    private Image _endStatePanelImage;
+    private Image _endStateButtonImage;
+    private Text _endStateTitleText;
+    private Text _endStateButtonText;
+    private bool _isEndStateShown;
 
     private void Awake()
     {
@@ -24,7 +31,7 @@ public class UIController : MonoBehaviour
             nextWaveButton = GameObject.Find("NextWave")?.GetComponent<Button>();
         }
 
-        EnsureWinPopup();
+        EnsureEndStatePopup();
     }
 
     private void OnEnable()
@@ -32,6 +39,7 @@ public class UIController : MonoBehaviour
         Spawner.OnWaveChanged += UpdateWaveText;
         Spawner.OnWaveStateChanged += UpdateNextWaveButtonState;
         Spawner.OnAllWavesCompleted += ShowWinPopup;
+        GameManager.OnGameOver += ShowGameOverPopup;
         GameManager.OnLivesChanged += UpdateLivesText;
         GameManager.OnResourcesChanged += UpdateResourcesText;
     }
@@ -40,13 +48,14 @@ public class UIController : MonoBehaviour
         Spawner.OnWaveChanged -= UpdateWaveText;
         Spawner.OnWaveStateChanged -= UpdateNextWaveButtonState;
         Spawner.OnAllWavesCompleted -= ShowWinPopup;
+        GameManager.OnGameOver -= ShowGameOverPopup;
         GameManager.OnLivesChanged -= UpdateLivesText;
         GameManager.OnResourcesChanged -= UpdateResourcesText;
     }
 
     private void OnDestroy()
     {
-        if (_hasWon)
+        if (_isEndStateShown)
         {
             Time.timeScale = 1f;
         }
@@ -71,27 +80,18 @@ public class UIController : MonoBehaviour
     {
         if (nextWaveButton != null)
         {
-            nextWaveButton.interactable = !isWaveActive && !_hasWon;
+            nextWaveButton.interactable = !isWaveActive && !_isEndStateShown;
         }
     }
 
     private void ShowWinPopup()
     {
-        _hasWon = true;
-        UpdateNextWaveButtonState(false);
+        ShowEndStatePopup(WinTitle, false);
+    }
 
-        if (_winPopup == null)
-        {
-            EnsureWinPopup();
-        }
-
-        if (_winPopup != null)
-        {
-            _winPopup.SetActive(true);
-            _winPopup.transform.SetAsLastSibling();
-        }
-
-        Time.timeScale = 0f;
+    private void ShowGameOverPopup()
+    {
+        ShowEndStatePopup(GameOverTitle, true);
     }
 
     private void ShowTowerPanel()
@@ -112,11 +112,47 @@ public class UIController : MonoBehaviour
         SceneManager.LoadScene(MainMenuSceneName);
     }
 
-    private void EnsureWinPopup()
+    private void ShowEndStatePopup(string title, bool isGameOver)
     {
-        if (_winPopup != null)
+        if (_isEndStateShown)
         {
-            _winPopup.SetActive(false);
+            return;
+        }
+
+        _isEndStateShown = true;
+        UpdateNextWaveButtonState(false);
+
+        if (towerPanel != null)
+        {
+            towerPanel.SetActive(false);
+        }
+
+        if (_endStatePopup == null)
+        {
+            EnsureEndStatePopup();
+        }
+
+        if (_endStateTitleText != null)
+        {
+            _endStateTitleText.text = title;
+        }
+
+        ApplyEndStateTheme(isGameOver);
+
+        if (_endStatePopup != null)
+        {
+            _endStatePopup.SetActive(true);
+            _endStatePopup.transform.SetAsLastSibling();
+        }
+
+        Time.timeScale = 0f;
+    }
+
+    private void EnsureEndStatePopup()
+    {
+        if (_endStatePopup != null)
+        {
+            _endStatePopup.SetActive(false);
             return;
         }
 
@@ -127,7 +163,7 @@ public class UIController : MonoBehaviour
             popupParent = canvas.transform;
         }
 
-        GameObject overlay = new GameObject("WinPopup", typeof(RectTransform), typeof(Image));
+        GameObject overlay = new GameObject("EndStatePopup", typeof(RectTransform), typeof(Image));
         overlay.transform.SetParent(popupParent, false);
 
         RectTransform overlayRect = overlay.GetComponent<RectTransform>();
@@ -136,8 +172,8 @@ public class UIController : MonoBehaviour
         overlayRect.offsetMin = Vector2.zero;
         overlayRect.offsetMax = Vector2.zero;
 
-        Image overlayImage = overlay.GetComponent<Image>();
-        overlayImage.color = new Color(0f, 0f, 0f, 0.72f);
+        _endStateOverlayImage = overlay.GetComponent<Image>();
+        _endStateOverlayImage.color = new Color(0f, 0f, 0f, 0.72f);
 
         GameObject panel = new GameObject("Panel", typeof(RectTransform), typeof(Image));
         panel.transform.SetParent(overlay.transform, false);
@@ -149,8 +185,8 @@ public class UIController : MonoBehaviour
         panelRect.sizeDelta = new Vector2(460f, 240f);
         panelRect.anchoredPosition = Vector2.zero;
 
-        Image panelImage = panel.GetComponent<Image>();
-        panelImage.color = new Color(0.94f, 0.96f, 1f, 1f);
+        _endStatePanelImage = panel.GetComponent<Image>();
+        _endStatePanelImage.color = new Color(0.94f, 0.96f, 1f, 1f);
 
         GameObject title = new GameObject("Title", typeof(RectTransform), typeof(Text));
         title.transform.SetParent(panel.transform, false);
@@ -161,12 +197,12 @@ public class UIController : MonoBehaviour
         titleRect.offsetMin = Vector2.zero;
         titleRect.offsetMax = Vector2.zero;
 
-        Text titleText = title.GetComponent<Text>();
-        titleText.text = "You Won!";
-        titleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        titleText.fontSize = 34;
-        titleText.alignment = TextAnchor.MiddleCenter;
-        titleText.color = new Color(0.1f, 0.15f, 0.23f, 1f);
+        _endStateTitleText = title.GetComponent<Text>();
+        _endStateTitleText.text = WinTitle;
+        _endStateTitleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        _endStateTitleText.fontSize = 34;
+        _endStateTitleText.alignment = TextAnchor.MiddleCenter;
+        _endStateTitleText.color = new Color(0.1f, 0.15f, 0.23f, 1f);
 
         GameObject buttonObject = new GameObject("MainMenuButton", typeof(RectTransform), typeof(Image), typeof(Button));
         buttonObject.transform.SetParent(panel.transform, false);
@@ -177,8 +213,8 @@ public class UIController : MonoBehaviour
         buttonRect.pivot = new Vector2(0.5f, 0.5f);
         buttonRect.sizeDelta = new Vector2(210f, 56f);
 
-        Image buttonImage = buttonObject.GetComponent<Image>();
-        buttonImage.color = new Color(0.18f, 0.45f, 0.85f, 1f);
+        _endStateButtonImage = buttonObject.GetComponent<Image>();
+        _endStateButtonImage.color = new Color(0.18f, 0.45f, 0.85f, 1f);
 
         Button button = buttonObject.GetComponent<Button>();
         button.onClick.AddListener(LoadMainMenu);
@@ -192,14 +228,38 @@ public class UIController : MonoBehaviour
         labelRect.offsetMin = Vector2.zero;
         labelRect.offsetMax = Vector2.zero;
 
-        Text buttonText = buttonLabel.GetComponent<Text>();
-        buttonText.text = "Main Menu";
-        buttonText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        buttonText.fontSize = 24;
-        buttonText.alignment = TextAnchor.MiddleCenter;
-        buttonText.color = Color.white;
+        _endStateButtonText = buttonLabel.GetComponent<Text>();
+        _endStateButtonText.text = "Main Menu";
+        _endStateButtonText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        _endStateButtonText.fontSize = 24;
+        _endStateButtonText.alignment = TextAnchor.MiddleCenter;
+        _endStateButtonText.color = Color.white;
 
         overlay.SetActive(false);
-        _winPopup = overlay;
+        _endStatePopup = overlay;
+    }
+
+    private void ApplyEndStateTheme(bool isGameOver)
+    {
+        if (_endStateOverlayImage == null || _endStatePanelImage == null || _endStateButtonImage == null || _endStateTitleText == null || _endStateButtonText == null)
+        {
+            return;
+        }
+
+        if (isGameOver)
+        {
+            _endStateOverlayImage.color = new Color(0.16f, 0f, 0f, 0.82f);
+            _endStatePanelImage.color = new Color(0.32f, 0.1f, 0.1f, 1f);
+            _endStateButtonImage.color = new Color(0.66f, 0.16f, 0.16f, 1f);
+            _endStateTitleText.color = new Color(1f, 0.85f, 0.85f, 1f);
+            _endStateButtonText.color = new Color(1f, 0.95f, 0.95f, 1f);
+            return;
+        }
+
+        _endStateOverlayImage.color = new Color(0f, 0.16f, 0f, 0.82f);
+        _endStatePanelImage.color = new Color(0.1f, 0.32f, 0.1f, 1f);
+        _endStateButtonImage.color = new Color(0.18f, 0.58f, 0.18f, 1f);
+        _endStateTitleText.color = new Color(0.88f, 1f, 0.88f, 1f);
+        _endStateButtonText.color = new Color(0.95f, 1f, 0.95f, 1f);
     }
 }

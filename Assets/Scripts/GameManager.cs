@@ -9,10 +9,12 @@ public class GameManager : MonoBehaviour
     // publish actions
     public static event Action<int> OnLivesChanged;
     public static event Action<int> OnResourcesChanged;
+    public static event Action OnGameOver;
 
     // Game Data (could be outsources to a Scriptable Object)
     private int _lives = 1;
     private int _resources = 50;
+    private bool _isGameOver;
 
     private void Awake()
     {
@@ -60,8 +62,19 @@ public class GameManager : MonoBehaviour
 
     private void HandleEnemyReachedEnd(EnemyData data)
     {
+        if (_isGameOver)
+        {
+            return;
+        }
+
         _lives = Mathf.Max(0, _lives - data.damage);
         OnLivesChanged?.Invoke(_lives);
+
+        if (_lives <= 0)
+        {
+            _isGameOver = true;
+            OnGameOver?.Invoke();
+        }
     }
 
     private void HandleEnemyDestroyed(Enemy enemy)
@@ -91,6 +104,11 @@ public class GameManager : MonoBehaviour
 
     public void HandleTowerPlacement(GameObject towerPrefab)
     {
+        if (_isGameOver)
+        {
+            return;
+        }
+
         Debug.Log("Placing Tower");
         int cost = towerPrefab.GetComponent<Tower>().Data.cost;
         if (!HasEnoughResources(cost)) return;
