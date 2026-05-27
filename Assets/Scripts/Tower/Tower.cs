@@ -174,13 +174,24 @@ public class Tower : MonoBehaviour
             return;
         }
 
+        Vector3 targetPosition = GetTargetPosition(target);
+        Vector2 aimDirection = (targetPosition - transform.position).normalized;
+        if (aimDirection.sqrMagnitude <= Mathf.Epsilon)
+        {
+            return;
+        }
+
+        // Rotate first so the shoot origin ends up in its final firing position.
+        // This keeps the projectile spawn point and direction aligned.
+        Rotate(aimDirection);
+
         projectile.transform.position = _projectileOrigin.position;
+        Vector2 shootDirection = (targetPosition - projectile.transform.position).normalized;
+        if (shootDirection.sqrMagnitude <= Mathf.Epsilon)
+        {
+            return;
+        }
 
-        Vector2 shootDirection = (GetTargetPosition(target) - _projectileOrigin.position).normalized;
-        Rotate(shootDirection);
-
-        // Recalculate after rotating so off-center shoot origins still point at the live target.
-        shootDirection = (GetTargetPosition(target) - _projectileOrigin.position).normalized;
         projectile.SetActive(true);
         projectile.GetComponent<Projectile>().Shoot(data, shootDirection);
     }
