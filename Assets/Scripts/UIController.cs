@@ -33,6 +33,7 @@ public class UIController : MonoBehaviour
         }
 
         _spawner = FindObjectOfType<Spawner>();
+        BindNextWaveButton();
         ConfigureNextWaveTooltip();
         EnsureEndStatePopup();
     }
@@ -85,6 +86,27 @@ public class UIController : MonoBehaviour
         {
             nextWaveButton.interactable = !isWaveActive && !_isEndStateShown;
         }
+    }
+
+    private void BindNextWaveButton()
+    {
+        if (nextWaveButton == null)
+        {
+            return;
+        }
+
+        nextWaveButton.onClick.RemoveListener(HandleNextWaveButtonClicked);
+        nextWaveButton.onClick.AddListener(HandleNextWaveButtonClicked);
+    }
+
+    private void HandleNextWaveButtonClicked()
+    {
+        if (_spawner == null)
+        {
+            _spawner = FindObjectOfType<Spawner>();
+        }
+
+        _spawner?.StartWave();
     }
 
     private void ShowWinPopup()
