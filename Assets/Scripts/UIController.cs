@@ -23,6 +23,7 @@ public class UIController : MonoBehaviour
     private Text _endStateTitleText;
     private Text _endStateButtonText;
     private bool _isEndStateShown;
+    private Spawner _spawner;
 
     private void Awake()
     {
@@ -31,6 +32,8 @@ public class UIController : MonoBehaviour
             nextWaveButton = GameObject.Find("NextWave")?.GetComponent<Button>();
         }
 
+        _spawner = FindObjectOfType<Spawner>();
+        ConfigureNextWaveTooltip();
         EnsureEndStatePopup();
     }
 
@@ -261,5 +264,41 @@ public class UIController : MonoBehaviour
         _endStateButtonImage.color = new Color(0.18f, 0.58f, 0.18f, 1f);
         _endStateTitleText.color = new Color(0.88f, 1f, 0.88f, 1f);
         _endStateButtonText.color = new Color(0.95f, 1f, 0.95f, 1f);
+    }
+
+    private void ConfigureNextWaveTooltip()
+    {
+        if (nextWaveButton == null)
+        {
+            return;
+        }
+
+        ButtonHoverTooltip tooltip = nextWaveButton.GetComponent<ButtonHoverTooltip>();
+        if (tooltip == null)
+        {
+            tooltip = nextWaveButton.gameObject.AddComponent<ButtonHoverTooltip>();
+        }
+
+        tooltip.Configure(BuildNextWaveTooltipText);
+    }
+
+    private string BuildNextWaveTooltipText()
+    {
+        if (_spawner == null)
+        {
+            _spawner = FindObjectOfType<Spawner>();
+        }
+
+        if (_spawner == null || !_spawner.TryGetNextWavePreview(out Spawner.WavePreview preview))
+        {
+            return "No more waves";
+        }
+
+        return $"Enemy: {preview.EnemyType}\nCount: {preview.EnemyCount}\nHealth: {FormatFloat(preview.EnemyHealth)}";
+    }
+
+    private static string FormatFloat(float value)
+    {
+        return Mathf.Approximately(value % 1f, 0f) ? value.ToString("0") : value.ToString("0.##");
     }
 }

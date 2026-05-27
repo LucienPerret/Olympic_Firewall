@@ -7,6 +7,20 @@ public class Spawner : MonoBehaviour
 {
     private const float BaseHealthMultiplier = 1f;
 
+    public struct WavePreview
+    {
+        public WavePreview(EnemyType enemyType, int enemyCount, float enemyHealth)
+        {
+            EnemyType = enemyType;
+            EnemyCount = enemyCount;
+            EnemyHealth = enemyHealth;
+        }
+
+        public EnemyType EnemyType { get; }
+        public int EnemyCount { get; }
+        public float EnemyHealth { get; }
+    }
+
     public static event Action<int> OnWaveChanged;
     public static event Action<bool> OnWaveStateChanged;
     public static event Action OnAllWavesCompleted;
@@ -157,5 +171,46 @@ public class Spawner : MonoBehaviour
 
         _allWavesCompleted = true;
         OnAllWavesCompleted?.Invoke();
+    }
+
+    public bool TryGetNextWavePreview(out WavePreview preview)
+    {
+        preview = default(WavePreview);
+
+        if (_allWavesCompleted || waves == null || waves.Length == 0)
+        {
+            return false;
+        }
+
+        int nextWaveIndex = (_currentWaveIndex + 1) % waves.Length;
+        WaveData nextWave = waves[nextWaveIndex];
+        if (!TryGetEnemyData(nextWave.enemyType, out EnemyData enemyData))
+        {
+            return false;
+        }
+
+        int nextWaveCounter = _waveCounter + 1;
+        float enemyHealth = enemyData.lives * (BaseHealthMultiplier + (nextWaveCounter * healthIncreasePerWave));
+        preview = new WavePreview(nextWave.enemyType, nextWave.enemiesPerWave, enemyHealth);
+        return true;
+    }
+
+    private bool TryGetEnemyData(EnemyType enemyType, out EnemyData enemyData)
+    {
+        enemyData = null;
+
+        if (!_poolDictionary.TryGetValue(enemyType, out ObejctPooler pool) || pool == null || pool.Prefab == null)
+        {
+            return false;
+        }
+
+        Enemy enemy = pool.Prefab.GetComponent<Enemy>();
+        if (enemy == null)
+        {
+            return false;
+        }
+
+        enemyData = enemy.Data;
+        return enemyData != null;
     }
 }
