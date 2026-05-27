@@ -8,6 +8,7 @@ public class TowerPlacement : MonoBehaviour
     private bool _canBePlaced;
     private SpriteColorFilter _colorFilter;
     private PlacementRangePreview _rangePreview;
+    private Path[] _paths = Array.Empty<Path>();
 
     [SerializeField] private float placementRadius = 0.4f;
     [SerializeField] private LayerMask blockedLayer;
@@ -35,6 +36,7 @@ public class TowerPlacement : MonoBehaviour
 
         _rangePreview.Configure(_data.range);
         blockedLayer = LayerMask.GetMask("Restricted");
+        RefreshPaths();
         isPlacing = true;
     }
 
@@ -67,13 +69,15 @@ public class TowerPlacement : MonoBehaviour
 
     private void CheckPlacementValidity()
     {
+        Vector2 placementPosition = transform.position;
         Collider2D hit = Physics2D.OverlapCircle(
-            transform.position,
+            placementPosition,
             placementRadius,
             blockedLayer
         );
 
-        _canBePlaced = hit == null;
+        bool overlapsPath = IsOverlappingPath(placementPosition);
+        _canBePlaced = hit == null && !overlapsPath;
     }
 
     private void UpdateVisual()
@@ -108,5 +112,29 @@ public class TowerPlacement : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, placementRadius);
+    }
+
+    private bool IsOverlappingPath(Vector2 placementPosition)
+    {
+        if (_paths.Length == 0)
+        {
+            RefreshPaths();
+        }
+
+        for (int i = 0; i < _paths.Length; i++)
+        {
+            Path path = _paths[i];
+            if (path != null && path.ContainsPosition(placementPosition, placementRadius))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void RefreshPaths()
+    {
+        _paths = FindObjectsByType<Path>(FindObjectsSortMode.None);
     }
 }

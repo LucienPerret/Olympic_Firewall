@@ -63,6 +63,37 @@ public class Path : MonoBehaviour
         return _cumulativeDistances[waypointIndex];
     }
 
+    public bool ContainsPosition(Vector2 position, float extraRadius = 0f)
+    {
+        EnsurePathData();
+
+        if (_cachedWaypointPositions.Length == 0)
+        {
+            return false;
+        }
+
+        float allowedDistance = Mathf.Max(0f, pathWidth * 0.5f + extraRadius);
+        float allowedDistanceSquared = allowedDistance * allowedDistance;
+
+        if (_cachedWaypointPositions.Length == 1)
+        {
+            return ((Vector2)_cachedWaypointPositions[0] - position).sqrMagnitude <= allowedDistanceSquared;
+        }
+
+        for (int i = 1; i < _cachedWaypointPositions.Length; i++)
+        {
+            Vector2 start = _cachedWaypointPositions[i - 1];
+            Vector2 end = _cachedWaypointPositions[i];
+
+            if (DistanceToSegmentSquared(position, start, end) <= allowedDistanceSquared)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void OnEnable()
     {
         pathWidth = Mathf.Max(0f, pathWidth);
@@ -313,6 +344,20 @@ public class Path : MonoBehaviour
     private static Vector2 Perpendicular(Vector2 direction)
     {
         return new Vector2(-direction.y, direction.x);
+    }
+
+    private static float DistanceToSegmentSquared(Vector2 point, Vector2 start, Vector2 end)
+    {
+        Vector2 segment = end - start;
+        float segmentLengthSquared = segment.sqrMagnitude;
+        if (segmentLengthSquared < MinSegmentLength)
+        {
+            return (point - start).sqrMagnitude;
+        }
+
+        float t = Mathf.Clamp01(Vector2.Dot(point - start, segment) / segmentLengthSquared);
+        Vector2 closestPoint = start + segment * t;
+        return (point - closestPoint).sqrMagnitude;
     }
 
     private void OnDrawGizmos()
