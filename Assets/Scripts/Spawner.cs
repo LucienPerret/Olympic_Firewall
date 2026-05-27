@@ -7,6 +7,7 @@ public class Spawner : MonoBehaviour
 {
     public static event Action<int> OnWaveChanged;
     public static event Action<bool> OnWaveStateChanged;
+    public static event Action OnAllWavesCompleted;
 
     [SerializeField] private WaveData[] waves;
     // Starts at 1 again after all waves are cleared
@@ -31,6 +32,7 @@ public class Spawner : MonoBehaviour
 
     private float _waveCooldown;
     private bool _runningWave;
+    private bool _allWavesCompleted;
 
     private void Awake()
     {
@@ -73,6 +75,11 @@ public class Spawner : MonoBehaviour
             else if (_spawnCounter >= CurrentWave.enemiesPerWave && _enemiesRemoved >= CurrentWave.enemiesPerWave)
             {
                 SetWaveRunning(false);
+
+                if (_waveCounter >= waves.Length - 1)
+                {
+                    CompleteAllWaves();
+                }
             }
 
         }
@@ -107,7 +114,7 @@ public class Spawner : MonoBehaviour
 
     public void StartWave()
     {
-        if (_runningWave || waves == null || waves.Length == 0)
+        if (_runningWave || _allWavesCompleted || waves == null || waves.Length == 0)
         {
             return;
         }
@@ -131,5 +138,16 @@ public class Spawner : MonoBehaviour
 
         _runningWave = isRunning;
         OnWaveStateChanged?.Invoke(_runningWave);
+    }
+
+    private void CompleteAllWaves()
+    {
+        if (_allWavesCompleted)
+        {
+            return;
+        }
+
+        _allWavesCompleted = true;
+        OnAllWavesCompleted?.Invoke();
     }
 }
