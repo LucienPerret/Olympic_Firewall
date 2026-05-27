@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
   targetType: 0
   range: 12
-  damage: 10
+  damage: 5
   damageInterval: 2
-  projectileSpeed: 40
-  projectileDuration: 1
+  projectileSpeed: 80
+  projectileDuration: 0.5
   projectileSize: 1
-  cost: 1
+  cost: 20

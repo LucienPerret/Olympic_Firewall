@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b347aeda53e42df4daa12c53443052fc, type: 3}
   m_Name: Enemy_Virox
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  lives: 5
-  speed: 5
+  lives: 10
+  speed: 7
   damage: 2
-  resourceReward: 1
+  resourceReward: 10

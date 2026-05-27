@@ -5,11 +5,14 @@ using UnityEngine.Serialization;
 
 public class Spawner : MonoBehaviour
 {
+    private const float BaseHealthMultiplier = 1f;
+
     public static event Action<int> OnWaveChanged;
     public static event Action<bool> OnWaveStateChanged;
     public static event Action OnAllWavesCompleted;
 
     [SerializeField] private WaveData[] waves;
+    [SerializeField] private float healthIncreasePerWave = 0.10f;
     // Starts at 1 again after all waves are cleared
     private int _currentWaveIndex = -1;
     // Counts further up each wave
@@ -92,14 +95,18 @@ public class Spawner : MonoBehaviour
             GameObject spawnedObject = pool.GetPooledObject();
             spawnedObject.transform.position = transform.position;
 
-            float healthMultiplier = 1f + (_waveCounter * 0.1f); // +10% per wave
             Enemy enemy = spawnedObject.GetComponent<Enemy>();
-            enemy.Initialize(healthMultiplier);
+            enemy.Initialize(GetCurrentWaveHealthMultiplier());
 
             spawnedObject.SetActive(true);
 
         }
         
+    }
+
+    private float GetCurrentWaveHealthMultiplier()
+    {
+        return BaseHealthMultiplier + (_waveCounter * healthIncreasePerWave);
     }
 
     private void HandleEnemyReachedEnd(EnemyData data)

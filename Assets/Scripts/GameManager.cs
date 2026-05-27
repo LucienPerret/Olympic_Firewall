@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
 
     public bool HasEnoughResources(int amount)
     {
-        return _resources > amount;
+        return _resources >= amount;
     }
 
     public void SpendResources(int amount)
