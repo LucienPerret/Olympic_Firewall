@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour
     public static event Action OnGameOver;
 
     // Game Data (could be outsources to a Scriptable Object)
-    private int _lives = 1;
-    private int _resources = 50;
+    [SerializeField] private int _lives = 100;
+    [SerializeField] private int _resources = 50;
     private bool _isGameOver;
 
     private void Awake()
