@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b347aeda53e42df4daa12c53443052fc, type: 3}
-  m_Name: Enemy_Kaiju
+  m_Name: Enemy_Virox
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  lives: 10
-  speed: 1
-  damage: 3
-  resourceReward: 3
+  lives: 5
+  speed: 5
+  damage: 2
+  resourceReward: 1
