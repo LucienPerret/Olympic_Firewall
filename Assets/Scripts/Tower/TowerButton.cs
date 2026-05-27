@@ -8,6 +8,7 @@ public class TowerButton : MonoBehaviour
 
     public void OnClick()
     {
+        SoundManager.Instance?.PlayButtonClick();
         OnTowerbuttonClick?.Invoke(towerPrefab);
         Debug.Log("ButtonPressed");
     }

@@ -101,11 +101,13 @@ public class UIController : MonoBehaviour
 
     public void HideTowerPanel()
     {
+        SoundManager.Instance?.PlayButtonClick();
         towerPanel.SetActive(false);
     }
 
     private void LoadMainMenu()
     {
+        SoundManager.Instance?.PlayButtonClick();
         Time.timeScale = 1f;
         SceneManager.LoadScene(MainMenuSceneName);
     }

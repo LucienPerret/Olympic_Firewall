@@ -119,6 +119,7 @@ public class Spawner : MonoBehaviour
             return;
         }
 
+        SoundManager.Instance?.PlayButtonClick();
         _currentWaveIndex = (_currentWaveIndex + 1) % waves.Length;
         _waveCounter++;
         OnWaveChanged?.Invoke(_waveCounter);

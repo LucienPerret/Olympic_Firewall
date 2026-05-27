@@ -60,18 +60,21 @@ public class LevelSelectMenu : MonoBehaviour
 
     private void ShowPreviousLevel()
     {
+        SoundManager.Instance?.PlayButtonClick();
         _currentIndex = (_currentIndex - 1 + _levels.Length) % _levels.Length;
         UpdateSelection();
     }
 
     private void ShowNextLevel()
     {
+        SoundManager.Instance?.PlayButtonClick();
         _currentIndex = (_currentIndex + 1) % _levels.Length;
         UpdateSelection();
     }
 
     private void StartSelectedLevel()
     {
+        SoundManager.Instance?.PlayButtonClick();
         SceneManager.LoadScene(_levels[_currentIndex].sceneName);
     }
 

@@ -4,6 +4,10 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private EnemyData data;
+    [Header("Audio")]
+    // Optional override clip for this enemy prefab. Leave empty to use the SoundManager default.
+    [Tooltip("Optional per-enemy death clip. Leave empty to use the SoundManager enemy death clip.")]
+    [SerializeField] private AudioClip deathSound;
     public EnemyData Data => data;
 
     public static event Action<EnemyData> OnEnemyReachedEnd;
@@ -113,6 +117,7 @@ public class Enemy : MonoBehaviour
         {
             if (_hasBeenCounted) return;
             _hasBeenCounted = true;
+            SoundManager.Instance?.PlayEnemyDeath(deathSound, transform.position);
             OnEnemyDestroyed?.Invoke(this);
             gameObject.SetActive(false);
         }

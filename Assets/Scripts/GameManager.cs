@@ -1,20 +1,30 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
+[DisallowMultipleComponent]
 public class GameManager : MonoBehaviour
 {
-    // Additional Manager
-    [SerializeField] private TowerManager towerManager;
+    public static GameManager Instance { get; private set; }
 
     // publish actions
     public static event Action<int> OnLivesChanged;
     public static event Action<int> OnResourcesChanged;
 
     // Game Data (could be outsources to a Scriptable Object)
-    private int _lives = 20;
+    private int _lives = 1;
     private int _resources = 50;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Duplicate GameManager found. Destroying the newer instance.");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     private void OnEnable()
     {
@@ -32,6 +42,14 @@ public class GameManager : MonoBehaviour
         TowerButton.OnTowerbuttonClick -= HandleTowerPlacement;
 
         TowerPlacement.OnPlacementConfirmed -= HandleTowerPlaced;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     private void Start()
@@ -67,17 +85,23 @@ public class GameManager : MonoBehaviour
     {
         _resources -= amount;
         OnResourcesChanged?.Invoke(_resources);
+        SoundManager.Instance?.PlayMoneySpent();
         Debug.Log("Resources spent");
     }
 
     public void HandleTowerPlacement(GameObject towerPrefab)
     {
         Debug.Log("Placing Tower");
-        //replace
         int cost = towerPrefab.GetComponent<Tower>().Data.cost;
         if (!HasEnoughResources(cost)) return;
 
-        towerManager.PlaceTower(towerPrefab);
+        if (TowerManager.Instance == null)
+        {
+            Debug.LogError("TowerManager.Instance is missing from the scene.");
+            return;
+        }
+
+        TowerManager.Instance.PlaceTower(towerPrefab);
 
     }
 
